@@ -1,16 +1,15 @@
 {
-  "name": "bull-spike",
+  "name": "Bull Topic",
   "version": "1.0.0",
-  "description": "",
+  "description": "A topic message queue based upon the Bull library",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start" : "nf start"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "James Darbyshire <james@darb.io>",
+  "license": "MIT",
   "dependencies": {
     "bull": "^2.2.1",
-    "foreman": "^2.0.0",
-    "node-redis-pubsub": "^1.0.2"
+    "foreman": "^2.0.0"
   }
 }
