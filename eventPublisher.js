@@ -1,13 +1,9 @@
-var NRP = require('node-redis-pubsub');
+var Queue = require('bull');
 
-var config = {
-    url: process.env.REDIS_URL
-};
-
-var nrp = new NRP(config);
+var queue = Queue('domain.events');
 
 setInterval(() => {
-  nrp.emit('domain.events.created', {
+  queue.add({
     eventName : 'domain.events.created'
   });
 }, 5000);

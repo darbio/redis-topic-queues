@@ -1,12 +1,7 @@
-var NRP = require('node-redis-pubsub');
 var Queue = require('bull');
 var _ = require('lodash');
 
-var config = {
-    url: process.env.REDIS_URL
-};
-
-var nrp = new NRP(config);
+var queue = Queue('domain.events');
 
 var registrations = [
   {
@@ -19,12 +14,14 @@ var registrations = [
   }
 ];
 
-nrp.on('domain.events.*', function(data, channel) {
-  console.log(`Event received event on ${channel}`);
+queue.process((job, done) => {
+  console.log(`Event received event on 'domain.events'`);
+
+  var event = job.data;
 
   // Get registrations
   var eventRegistrations = _.filter(registrations, (a) =>{
-    return a.eventName == channel;
+    return a.eventName == event.eventName;
   });
   console.log(`There are ${eventRegistrations.length} listeners for this event.`)
 
@@ -34,7 +31,9 @@ nrp.on('domain.events.*', function(data, channel) {
     console.log(`Publishing received event to ${registration.queueName}`);
 
     var queue = Queue(registration.queueName);
-    queue.add(data);
+    queue.add(event);
     queue.close();
   }
+
+  done();
 });
