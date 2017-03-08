@@ -1,9 +1,10 @@
 # Redis Topic -> Queues
 
-This project uses NRP and Bull to provide a fan out topic whereby a domain event
-can be published by the event publisher to a topic. The topic listens to the
-events which are sent to the topic, where a list of registrations are maintained
-by the process. The topic then re-emits the event onto the queue for processing.
+This project [Bull](https://www.npmjs.com/package/bull) to provide a fan out
+topic whereby a domain event can be published by the event publisher to a topic.
+The topic listens to the events which are sent to the topic, where a list of
+registrations are maintained by the process. The topic then re-emits the event
+onto the queue for processing.
 
 The simple architecture for this is as follows:
 
@@ -19,13 +20,14 @@ To run the example:
 1. `npm install`
 2. `nf start`
 
-In our example, we have an API which emits domain events to NRP. These domain
-events all have a name which is prefixed by `domain.events.`. Domain events all
-have individual names, which extend the prefix (e.g. `domain.events.created`).
+In our example, we have an API which emits domain events to a Bull queue called
+`domain.events`. These domain events all have a property called `eventName`
+which is prefixed by `domain.events.`. Domain events all have individual names,
+which extend the prefix (e.g. `domain.events.created`).
 
 Our topic is a worker process which listens for all events published on the
-topic `domain.events.*`, so catches all of the domain events which get published
-by the API.
+topic `domain.events`, so catches all of the domain events which get published
+by the publishing process.
 
 When the topic receives an event, it searches through it's list of registrations
 to see if there are any jobs which are registered against that event. For each
@@ -40,13 +42,8 @@ then consumed by the two processes.
 
 # Things to be aware of
 
-If your topic worker process dies for some reason, domain events will be lost,
-meaning that jobs may not ever get processed as they were never published. This
-can be fixed by persisting the events to an event store of some description
-(e.g. a NoSQL datastore).
-
 This configuration uses up a few connections to a Redis server. The publisher
-uses 1 x connection, the topic uses 2 x connection for pubsub and 2 x the number
+uses 2 x connection, the topic uses 2 x connection for pubsub and 2 x the number
 of queues you intend to publish to. Each worker process uses 2 x connections to
 Redis (I think...).
 
@@ -54,7 +51,7 @@ Redis (I think...).
 
 MIT License
 
-Copyright (c) 2017 James Darbyshire (darb.io)
+Copyright (c) 2017 James Darbyshire <james@darb.io>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
